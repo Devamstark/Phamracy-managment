@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: pharmacy-postgres
+    environment:
+      POSTGRES_USER: pharmacy_user
+      POSTGRES_PASSWORD: pharmacy_password
+      POSTGRES_DB: pharmacy_erx
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pharmacy-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pharmacy_user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pharmacy-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pharmacy.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    networks:
+      - pharmacy-network
+    depends_on:
+      - postgres
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pharmacy-backend
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: pharmacy_user
+      DB_PASSWORD: pharmacy_password
+      DB_DATABASE: pharmacy_erx
+      DB_SYNCHRONIZE: "true"
+      DB_LOGGING: "false"
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production-min-32-chars
+      JWT_EXPIRES_IN: 24h
+      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-this-in-production-min-32-chars
+      JWT_REFRESH_EXPIRES_IN: 7d
+      PHARMACY_NAME: MediCare Pharmacy
+      PHARMACY_ADDRESS: 123 Main Street, Mumbai, Maharashtra 400001
+      PHARMACY_PHONE: +91-22-12345678
+      PHARMACY_EMAIL: info@medicarepharmacy.in
+      PHARMACY_GST_NUMBER: 27AAAAA0000A1Z5
+      PHARMACY_LICENSE_NUMBER: MH-MUM-12345
+    ports:
+      - "5000:5000"
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_logs:/app/logs
+    networks:
+      - pharmacy-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pharmacy-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - pharmacy-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  pharmacy-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  backend_uploads:
+  backend_logs:
