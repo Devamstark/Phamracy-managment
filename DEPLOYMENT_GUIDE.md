@@ -27,7 +27,7 @@ Copy the commands shown on GitHub under "…or push an existing repository from 
 
 ```bash
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/pharmacy-erx-system.git
+git remote add origin https://github.com/Devamstark/Phamracy-managment.git
 git push -u origin main
 ```
 
