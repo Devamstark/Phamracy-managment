@@ -21,7 +21,7 @@ export class InventoryController {
                 return;
             }
 
-            const medicine = await inventoryService.addMedicine(value);
+            const medicine = await inventoryService.addMedicine(value as any);
 
             res.status(201).json({
                 success: true,
@@ -47,7 +47,7 @@ export class InventoryController {
                 return;
             }
 
-            const medicine = await inventoryService.updateMedicine(id, value);
+            const medicine = await inventoryService.updateMedicine(id, value as any);
 
             res.json({
                 success: true,
@@ -119,7 +119,7 @@ export class InventoryController {
                 return;
             }
 
-            const batch = await inventoryService.addBatch(value);
+            const batch = await inventoryService.addBatch(value as any);
 
             res.status(201).json({
                 success: true,

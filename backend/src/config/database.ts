@@ -30,6 +30,7 @@ export const AppDataSource = new DataSource({
     entities: [User, Medicine, Batch, Prescription, Sale, SaleItem, AuditLog],
     migrations: [path.join(__dirname, '../migrations/*.ts')],
     subscribers: [],
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     // Connection pool settings
     extra: {
         max: 20,

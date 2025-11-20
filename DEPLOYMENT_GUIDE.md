@@ -1,91 +1,75 @@
-# 🚀 How to Publish to GitHub & Deploy Your Website
+# 🚀 Free Deployment Guide (Vercel + Render + Neon)
 
-This guide will help you push your "Pharmacy Inventory & eRx System" to GitHub and deploy it to the web so anyone can access it.
-
----
-
-## Part 1: Push to GitHub
-
-### 1. Initialize Git
-Open your terminal in the project root (`c:\Users\Admin\Downloads\pharmacy-inventory-eRx`) and run:
-
-```bash
-git init
-git add .
-git commit -m "Initial commit: Complete Pharmacy System"
-```
-
-### 2. Create a Repository on GitHub
-1. Go to [GitHub.com](https://github.com) and log in.
-2. Click the **+** icon in the top right and select **New repository**.
-3. Name it `pharmacy-erx-system`.
-4. Make it **Private** (recommended since it contains business logic) or **Public**.
-5. Click **Create repository**.
-
-### 3. Connect and Push
-Copy the commands shown on GitHub under "…or push an existing repository from the command line" and run them in your terminal:
-
-```bash
-git branch -M main
-git remote add origin https://github.com/Devamstark/Phamracy-managment.git
-git push -u origin main
-```
+Since Railway isn't working, here is the **Best Free Stack** to host your Pharmacy System.
 
 ---
 
-## Part 2: Deploy to the Web (Make it Live)
+## Part 1: The Database (Neon)
+We need a place to store data. Neon offers a generous free PostgreSQL tier.
 
-Since this is a full-stack app (Frontend + Backend + Database), you need to host 3 parts. The easiest free/cheap way is using **Render** or **Railway**.
-
-### Option A: The Easiest Way (Railway.app)
-**Railway** is great because it can host everything in one place.
-
-1. **Sign up** at [Railway.app](https://railway.app/) using your GitHub account.
-2. Click **New Project** > **Deploy from GitHub repo**.
-3. Select your `pharmacy-erx-system` repo.
-4. **Add a Database:**
-   - In your project view, click **New** > **Database** > **PostgreSQL**.
-   - Railway will give you connection variables (Host, User, Password, etc.).
-5. **Configure Backend:**
-   - Go to your backend service settings.
-   - Add Environment Variables matching your local `.env` (but use the Railway Database values):
-     - `DB_HOST`: (from Railway)
-     - `DB_PASSWORD`: (from Railway)
-     - `DB_USERNAME`: (from Railway)
-     - `PORT`: `5000`
-   - Set the **Start Command**: `npm start` (Make sure `package.json` has `"start": "node dist/server.js"`).
-6. **Configure Frontend:**
-   - Add Environment Variables:
-     - `VITE_API_URL`: The URL of your deployed Backend (e.g., `https://backend-production.up.railway.app`).
-
-### Option B: The "Pro" Way (Vercel + Render)
-This splits the services for better performance.
-
-#### 1. Database (Neon or Render)
-1. Go to [Neon.tech](https://neon.tech) (Free Tier is great).
-2. Create a project. Copy the **Connection String**.
-
-#### 2. Backend (Render.com)
-1. Sign up at [Render.com](https://render.com).
-2. Click **New +** > **Web Service**.
-3. Connect your GitHub repo.
-4. **Root Directory:** `backend`
-5. **Build Command:** `npm install && npm run build`
-6. **Start Command:** `npm start`
-7. **Environment Variables:** Add your Database URL from Neon.
-
-#### 3. Frontend (Vercel)
-1. Sign up at [Vercel.com](https://vercel.com).
-2. Click **Add New** > **Project**.
-3. Import your GitHub repo.
-4. **Root Directory:** `frontend`
-5. **Framework Preset:** Vite
-6. **Environment Variables:**
-   - `VITE_API_URL`: The URL of your deployed Render Backend.
-7. Click **Deploy**.
+1.  Go to [Neon.tech](https://neon.tech) and Sign Up.
+2.  Create a **New Project** (name it `pharmacy-db`).
+3.  It will show you a **Connection String**. It looks like this:
+    `postgres://neondb_owner:AbC123xyz@ep-cool-frog-123456.us-east-2.aws.neon.tech/neondb?sslmode=require`
+4.  **Save this string!** You will need to break it down for the Backend:
+    -   **DB_HOST**: `ep-cool-frog-123456.us-east-2.aws.neon.tech`
+    -   **DB_USERNAME**: `neondb_owner`
+    -   **DB_PASSWORD**: `AbC123xyz`
+    -   **DB_DATABASE**: `neondb`
+    -   **DB_PORT**: `5432`
+    -   **DB_SSL**: `true`
 
 ---
 
-## 💡 Important Notes for Deployment
-- **Database Migration:** When you first deploy, your cloud database will be empty. You may need to run your seed script remotely or connect to the cloud DB from your local machine to seed it.
-- **CORS:** In your backend `server.ts`, update `cors({ origin: ... })` to allow your new Frontend URL (e.g., `https://your-pharmacy-app.vercel.app`).
+## Part 2: The Backend (Render)
+Render will host your Node.js server.
+
+1.  Go to [Render.com](https://render.com) and Sign Up.
+2.  Click **New +** -> **Web Service**.
+3.  Connect your GitHub repository: `Devamstark/Phamracy-managment`.
+4.  **Configure the Service:**
+    -   **Name:** `pharmacy-backend`
+    -   **Root Directory:** `backend`  <-- IMPORTANT
+    -   **Runtime:** Node
+    -   **Build Command:** `npm install && npm run build`
+    -   **Start Command:** `npm start`
+    -   **Instance Type:** Free
+5.  **Environment Variables (Click "Advanced"):**
+    Add these variables using the data from Neon (Part 1):
+    -   `DB_HOST`: (your neon host)
+    -   `DB_USERNAME`: (your neon user)
+    -   `DB_PASSWORD`: (your neon password)
+    -   `DB_DATABASE`: (your neon db name)
+    -   `DB_PORT`: `5432`
+    -   `DB_SSL`: `true`
+    -   `JWT_SECRET`: (create a random long password like `mysecretkey123`)
+    -   `CORS_ORIGIN`: `*` (We will change this to your frontend URL later)
+6.  Click **Create Web Service**.
+7.  Wait for it to deploy. Copy the **URL** (e.g., `https://pharmacy-backend.onrender.com`).
+
+---
+
+## Part 3: The Frontend (Vercel)
+Vercel is the best place to host React apps.
+
+1.  Go to [Vercel.com](https://vercel.com) and Sign Up.
+2.  Click **Add New...** -> **Project**.
+3.  Import `Devamstark/Phamracy-managment`.
+4.  **Configure Project:**
+    -   **Framework Preset:** Vite
+    -   **Root Directory:** Click "Edit" and select `frontend`.
+5.  **Environment Variables:**
+    -   `VITE_API_URL`: Paste your Render Backend URL here (e.g., `https://pharmacy-backend.onrender.com`).
+6.  Click **Deploy**.
+
+---
+
+## Part 4: Final Connection
+Once Vercel deploys, you will get a website URL (e.g., `https://pharmacy-frontend.vercel.app`).
+
+1.  Go back to **Render (Backend)**.
+2.  Go to **Environment Variables**.
+3.  Edit `CORS_ORIGIN` and paste your Vercel URL (e.g., `https://pharmacy-frontend.vercel.app`).
+4.  Save changes. Render will restart.
+
+**🎉 Done! Your website is live.**

@@ -31,7 +31,7 @@ export class SalesController {
             }
 
             const sale = await billingService.createSale({
-                ...value,
+                ...(value as any),
                 createdById: req.userId,
             });
 
