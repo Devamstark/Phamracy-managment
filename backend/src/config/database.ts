@@ -20,11 +20,11 @@ import { AuditLog } from '../models/AuditLog';
  */
 export const AppDataSource = new DataSource({
     type: 'postgres',
-    host: process.env.DB_HOST || 'localhost',
+    host: (process.env.DB_HOST || 'localhost').trim(),
     port: parseInt(process.env.DB_PORT || '5432'),
-    username: process.env.DB_USERNAME || 'pharmacy_user',
-    password: process.env.DB_PASSWORD || 'pharmacy_password',
-    database: process.env.DB_DATABASE || 'pharmacy_erx',
+    username: (process.env.DB_USERNAME || 'pharmacy_user').trim(),
+    password: (process.env.DB_PASSWORD || 'pharmacy_password').trim(),
+    database: (process.env.DB_DATABASE || 'pharmacy_erx').trim(),
     synchronize: process.env.DB_SYNCHRONIZE === 'true', // Only true in development
     logging: process.env.DB_LOGGING === 'true',
     entities: [User, Medicine, Batch, Prescription, Sale, SaleItem, AuditLog],
