@@ -1,0 +1,8 @@
+DB_HOST=ep-divine-dream-adlmvu9h-pooler.c-2.us-east-1.aws.neon.tech
+DB_USERNAME=neondb_owner
+DB_PASSWORD=npg_fme6Bp7hNFMx
+DB_DATABASE=neondb
+DB_PORT=5432
+DB_SSL=true
+JWT_SECRET=pharmacy_erx_secret_key_change_this_in_production
+CORS_ORIGIN=*
